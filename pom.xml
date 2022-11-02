@@ -21,7 +21,7 @@
             <artifactId>mktdatasim-server</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${basedir}/lib/mktdatasim-server-1.0.jar</systemPath>
+            <systemPath>${pom.basedir}/lib/mktdatasim-server-1.0.jar</systemPath>
         </dependency>
 
         <dependency>
