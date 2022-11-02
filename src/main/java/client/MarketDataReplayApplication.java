@@ -1,11 +1,14 @@
 package client;
 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import server.MarketDataSimulator;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class Main {
+@SpringBootApplication
+public class MarketDataReplayApplication {
 
     /**
      * Instantiate and run the market data simulator
@@ -49,6 +52,8 @@ public class Main {
         // Run simulator / replay
         MarketDataSimulator marketDataSimulator = new MarketDataSimulator(replayDate, speedFactor, nbThreads, marketDataClient::onMessage, marketDataClient::onError);
         marketDataSimulator.start();
+
+        SpringApplication.run(MarketDataReplayApplication.class, args);
     }
 
     private static void setup() {
