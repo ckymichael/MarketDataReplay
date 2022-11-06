@@ -1,5 +1,8 @@
 package client;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class MarketDataClient {
 
     /**
@@ -43,9 +46,9 @@ public class MarketDataClient {
      *
      * @param message The message received from the market data simulator
      */
-    public void onMessage(String message) {
+    public synchronized void onMessage(String message) {
 
-        // @TODO
+        log.info(message);
     }
 
     /**
@@ -53,7 +56,7 @@ public class MarketDataClient {
      *
      * @param e The error (could be an internal error thrown by the simulation engine itself, or an error raised by the client while processing a message)
      */
-    public void onError(Throwable e) {
+    public synchronized void onError(Throwable e) {
 
         e.printStackTrace(System.err);
     }

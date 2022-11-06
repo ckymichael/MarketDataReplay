@@ -1,0 +1,7 @@
+logging:
+  file:
+    name: MarketDataReplayApplication.log
+    max-size: 100000GB
+  level:
+    root: INFO
+    org.springframework.web: INFO
