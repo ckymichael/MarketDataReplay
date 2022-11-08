@@ -39,9 +39,9 @@ public class Trade extends MarketData {
      * @param basePrice base price
      * @return Intra day price movement in percentage
      */
-    public Double calculatePriceMovement(@NonNull BasePrice basePrice) {
+    public Double calculatePriceMovementInPercent(@NonNull BasePrice basePrice) {
         Assert.isTrue(getCode().equals(basePrice.getCode()), String.format("Unmatched Code: trade [%s], " +
                 "basePrice [%s]", getCode(), basePrice.getCode()));
-        return getPrice() / basePrice.getBasePrice() - 1;
+        return (getPrice() / basePrice.getBasePrice() - 1) * 100;
     }
 }

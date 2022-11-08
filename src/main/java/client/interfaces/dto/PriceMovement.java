@@ -5,5 +5,5 @@ import lombok.Value;
 @Value
 public class PriceMovement {
     String code;
-    double priceMovement;
+    double priceMovementInPercent;
 }

@@ -135,14 +135,14 @@ class MarketDataServiceTest {
     void getHighestPriceMovement() {
         PriceMovement priceMove = marketDataService.getHighestPriceMovement(1).get(0);
         assertEquals(priceMove.getCode(), trade5.getCode());
-        assertEquals(priceMove.getPriceMovement(), trade5.calculatePriceMovement(price1));
+        assertEquals(priceMove.getPriceMovementInPercent(), trade5.calculatePriceMovement(price1));
     }
 
     @Test
     void getLowestPriceMovement() {
         PriceMovement priceMove = marketDataService.getLowestPriceMovement(1).get(0);
         assertEquals(priceMove.getCode(), trade4.getCode());
-        assertEquals(priceMove.getPriceMovement(), trade4.calculatePriceMovement(price4));
+        assertEquals(priceMove.getPriceMovementInPercent(), trade4.calculatePriceMovement(price4));
     }
 
     @Test
