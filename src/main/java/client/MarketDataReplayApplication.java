@@ -4,11 +4,13 @@ import client.domain.MarketDataClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import server.MarketDataSimulator;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+@EnableWebMvc
 @SpringBootApplication
 public class MarketDataReplayApplication {
 
