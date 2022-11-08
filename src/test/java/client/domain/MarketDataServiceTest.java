@@ -144,4 +144,11 @@ class MarketDataServiceTest {
         assertEquals(priceMove.getCode(), trade4.getCode());
         assertEquals(priceMove.getPriceMovement(), trade4.calculatePriceMovement(price4));
     }
+
+    @Test
+    void testInvalidInput() {
+        Throwable exception = assertThrows(IllegalArgumentException.class,
+                () -> marketDataService.getMostTradedByTurnover(0).get(0));
+        assertEquals("numberOfData=0 must be greater than 0", exception.getMessage());
+    }
 }
