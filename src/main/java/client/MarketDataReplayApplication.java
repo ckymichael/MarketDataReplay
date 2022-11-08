@@ -1,7 +1,9 @@
 package client;
 
+import client.domain.MarketDataClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 import server.MarketDataSimulator;
 
 import java.time.LocalDate;
@@ -38,6 +40,7 @@ public class MarketDataReplayApplication {
      *             </ul>
      */
     public static void main(String... args) throws InterruptedException {
+        ConfigurableApplicationContext context = SpringApplication.run(MarketDataReplayApplication.class, args);
 
         setup();
 
@@ -47,13 +50,11 @@ public class MarketDataReplayApplication {
         int nbThreads = Integer.parseInt(args[2]);
 
         // Instantiate client
-        MarketDataClient marketDataClient = new MarketDataClient();
+        MarketDataClient marketDataClient = context.getBean(MarketDataClient.class);
 
         // Run simulator / replay
         MarketDataSimulator marketDataSimulator = new MarketDataSimulator(replayDate, speedFactor, nbThreads, marketDataClient::onMessage, marketDataClient::onError);
         marketDataSimulator.start();
-
-        SpringApplication.run(MarketDataReplayApplication.class, args);
     }
 
     private static void setup() {

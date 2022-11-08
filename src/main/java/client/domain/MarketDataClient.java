@@ -1,9 +1,18 @@
-package client;
+package client.domain;
 
+import client.domain.model.MarketData;
+import client.domain.model.MarketDataParser;
+import client.domain.model.Trade;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Slf4j
+@Service
 public class MarketDataClient {
+
+    @Autowired
+    MarketDataService marketDataService;
 
     /**
      * Parse a message received from the market data simulator.
@@ -47,8 +56,10 @@ public class MarketDataClient {
      * @param message The message received from the market data simulator
      */
     public synchronized void onMessage(String message) {
-
-        log.info(message);
+        MarketData marketData = new MarketDataParser().apply(message);
+        if (marketData.getClass() == Trade.class) {
+            marketDataService.handleNewTradeData((Trade) marketData);
+        }
     }
 
     /**

@@ -5,3 +5,6 @@ logging:
   level:
     root: INFO
     org.springframework.web: INFO
+springdoc:
+  swagger-ui.use-root-path: true
+  default-produces-media-type: application/json
