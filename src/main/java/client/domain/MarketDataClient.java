@@ -1,5 +1,6 @@
 package client.domain;
 
+import client.domain.model.BasePrice;
 import client.domain.model.MarketData;
 import client.domain.model.MarketDataParser;
 import client.domain.model.Trade;
@@ -59,6 +60,8 @@ public class MarketDataClient {
         MarketData marketData = new MarketDataParser().apply(message);
         if (marketData.getClass() == Trade.class) {
             marketDataService.handleNewTradeData((Trade) marketData);
+        } else if (marketData.getClass() == BasePrice.class) {
+            marketDataService.handleBasePriceData((BasePrice) marketData);
         }
     }
 

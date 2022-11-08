@@ -2,6 +2,8 @@ package client.domain.model;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.lang.NonNull;
+import org.springframework.util.Assert;
 
 import java.time.LocalTime;
 
@@ -29,5 +31,17 @@ public class Trade extends MarketData {
      */
     public double getTurnover() {
         return cumulativeVolume * vwap;
+    }
+
+
+    /**
+     *
+     * @param basePrice base price
+     * @return Intra day price movement in percentage
+     */
+    public Double calculatePriceMovement(@NonNull BasePrice basePrice) {
+        Assert.isTrue(getCode().equals(basePrice.getCode()), String.format("Unmatched Code: trade [%s], " +
+                "basePrice [%s]", getCode(), basePrice.getCode()));
+        return getPrice() / basePrice.getBasePrice() - 1;
     }
 }

@@ -2,6 +2,7 @@ package client.interfaces.controller;
 
 import client.domain.MarketDataService;
 import client.interfaces.dto.CumulativeVolume;
+import client.interfaces.dto.PriceMovement;
 import client.interfaces.dto.Turnover;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,15 +30,15 @@ public class MarketDataController {
         return new ResponseEntity<>(cumulativeVolumes, HttpStatus.OK);
     }
 
-    @GetMapping("/leastTradedByTurnover")
-    public ResponseEntity<List<Turnover>> getLeastTradedByTurnover(@RequestParam int numberOfData) {
-        List<Turnover> turnovers = marketDataService.getLeastTradedByTurnover(numberOfData);
-        return new ResponseEntity<>(turnovers, HttpStatus.OK);
+    @GetMapping("/highestPriceMovement")
+    public ResponseEntity<List<PriceMovement>> getHighestPriceMovement(@RequestParam int numberOfData) {
+        List<PriceMovement> priceMovements = marketDataService.getHighestPriceMovement(numberOfData);
+        return new ResponseEntity<>(priceMovements, HttpStatus.OK);
     }
 
-    @GetMapping("/leastTradedByVolume")
-    public ResponseEntity<List<CumulativeVolume>> getLeastTradedByVolume(@RequestParam int numberOfData) {
-        List<CumulativeVolume> cumulativeVolumes = marketDataService.getLeastTradedByVolume(numberOfData);
-        return new ResponseEntity<>(cumulativeVolumes, HttpStatus.OK);
+    @GetMapping("/lowestPriceMovement")
+    public ResponseEntity<List<PriceMovement>> getLowestPriceMovement(@RequestParam int numberOfData) {
+        List<PriceMovement> priceMovements = marketDataService.getLowestPriceMovement(numberOfData);
+        return new ResponseEntity<>(priceMovements, HttpStatus.OK);
     }
 }

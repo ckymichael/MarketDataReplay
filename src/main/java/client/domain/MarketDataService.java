@@ -1,10 +1,13 @@
 package client.domain;
 
+import client.domain.model.BasePrice;
 import client.domain.model.Trade;
 import client.interfaces.dto.CumulativeVolume;
+import client.interfaces.dto.PriceMovement;
 import client.interfaces.dto.Turnover;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -21,12 +24,14 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MarketDataService {
     ConcurrentMap<String, Trade> latestCodeToTrade = new ConcurrentHashMap<>();
+    ConcurrentMap<String, BasePrice> codeToBasePrice = new ConcurrentHashMap<>();
     ConcurrentSkipListMap<Double, List<String>> sortedTurnoverToCode = new ConcurrentSkipListMap<>();
     ConcurrentSkipListMap<Double, List<String>> sortedVolumeToCode = new ConcurrentSkipListMap<>();
+    ConcurrentSkipListMap<Double, List<String>> sortedPriceMovementToCode = new ConcurrentSkipListMap<>();
 
     /**
      * update the trade data
-     * @param trade
+     * @param trade new trade
      */
     public synchronized void handleNewTradeData(Trade trade) {
         Trade lastTrade = latestCodeToTrade.get(trade.getCode());
@@ -34,27 +39,52 @@ public class MarketDataService {
             log.warn("Not processing out of sequence trade, code={}, current sequence number={}, new trade sequence" +
                     " number={}", lastTrade.getCode(), lastTrade.getSequenceNumber(), trade.getSequenceNumber());
         } else {
-            if (lastTrade != null) {
-                removePreviousTradeData(lastTrade);
-            }
-            updateNewTradeData(trade);
+            updateNewTradeData(trade, lastTrade);
         }
     }
 
-    private void removePreviousTradeData(Trade previousTrade) {
-        latestCodeToTrade.remove(previousTrade.getCode());
-        sortedTurnoverToCode.get(previousTrade.getTurnover()).remove(previousTrade.getCode());
-        sortedVolumeToCode.get(previousTrade.getCumulativeVolume()).remove(previousTrade.getCode());
+    public synchronized void handleBasePriceData(BasePrice basePrice) {
+        codeToBasePrice.put(basePrice.getCode(), basePrice);
     }
 
-    private void updateNewTradeData(Trade newTrade) {
+    private void updateNewTradeData(Trade newTrade, @Nullable Trade previousTrade) {
+        String code = newTrade.getCode();
+        if (previousTrade != null) {
+            latestCodeToTrade.remove(code);
+            sortedTurnoverToCode.get(previousTrade.getTurnover()).remove(code);
+            sortedVolumeToCode.get(previousTrade.getCumulativeVolume()).remove(code);
+        }
         latestCodeToTrade.put(newTrade.getCode(), newTrade);
-        sortedTurnoverToCode.computeIfAbsent(newTrade.getTurnover(), k -> new ArrayList<>()).add(newTrade.getCode());
-        sortedVolumeToCode.computeIfAbsent(newTrade.getCumulativeVolume(), k -> new ArrayList<>()).add(newTrade.getCode());
+        sortedTurnoverToCode.computeIfAbsent(newTrade.getTurnover(), k -> new ArrayList<>()).add(code);
+        sortedVolumeToCode.computeIfAbsent(newTrade.getCumulativeVolume(), k -> new ArrayList<>()).add(code);
+
+        updatePriceMovement(newTrade, previousTrade);
+    }
+
+    private void updatePriceMovement(Trade newTrade, @Nullable Trade previousTrade) {
+        String code = newTrade.getCode();
+        BasePrice basePrice = codeToBasePrice.get(code);
+        if (basePrice != null) {
+            if (previousTrade != null) {
+                Double prevPriceMove = previousTrade.calculatePriceMovement(basePrice);
+                sortedPriceMovementToCode.get(prevPriceMove).remove(code);
+            }
+            Double newPriceMove = newTrade.calculatePriceMovement(basePrice);
+            sortedPriceMovementToCode.computeIfAbsent(newPriceMove, k -> new ArrayList<>()).add(code);
+
+        } else {
+            log.warn("Base price of {} cannot be found", code);
+        }
     }
 
     public List<Turnover> getMostTradedByTurnover(int n) {
         return getSorted(n, sortedTurnoverToCode, true).stream()
+                .map(p -> new Turnover(p.getValue(), p.getKey()))
+                .collect(Collectors.toList());
+    }
+
+    public List<Turnover> getLeastTradedByTurnover(int n) {
+        return getSorted(n, sortedTurnoverToCode, false).stream()
                 .map(p -> new Turnover(p.getValue(), p.getKey()))
                 .collect(Collectors.toList());
     }
@@ -65,15 +95,21 @@ public class MarketDataService {
                 .collect(Collectors.toList());
     }
 
-    public List<Turnover> getLeastTradedByTurnover(int n) {
-        return getSorted(n, sortedTurnoverToCode, false).stream()
-                .map(p -> new Turnover(p.getValue(), p.getKey()))
-                .collect(Collectors.toList());
-    }
-
     public List<CumulativeVolume> getLeastTradedByVolume(int n) {
         return getSorted(n, sortedVolumeToCode, false).stream()
                 .map(p -> new CumulativeVolume(p.getValue(), p.getKey()))
+                .collect(Collectors.toList());
+    }
+
+    public List<PriceMovement> getHighestPriceMovement(int n) {
+        return getSorted(n, sortedPriceMovementToCode, true).stream()
+                .map(p -> new PriceMovement(p.getValue(), p.getKey()))
+                .collect(Collectors.toList());
+    }
+
+    public List<PriceMovement> getLowestPriceMovement(int n) {
+        return getSorted(n, sortedPriceMovementToCode, false).stream()
+                .map(p -> new PriceMovement(p.getValue(), p.getKey()))
                 .collect(Collectors.toList());
     }
 
