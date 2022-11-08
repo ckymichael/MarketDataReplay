@@ -66,10 +66,10 @@ public class MarketDataService {
         BasePrice basePrice = codeToBasePrice.get(code);
         if (basePrice != null) {
             if (previousTrade != null) {
-                Double prevPriceMove = previousTrade.calculatePriceMovement(basePrice);
+                Double prevPriceMove = previousTrade.calculatePriceMovementInPercent(basePrice);
                 sortedPriceMovementToCode.get(prevPriceMove).remove(code);
             }
-            Double newPriceMove = newTrade.calculatePriceMovement(basePrice);
+            Double newPriceMove = newTrade.calculatePriceMovementInPercent(basePrice);
             sortedPriceMovementToCode.computeIfAbsent(newPriceMove, k -> new ArrayList<>()).add(code);
 
         } else {
