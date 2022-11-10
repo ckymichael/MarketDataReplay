@@ -10,7 +10,7 @@ Technical stack
 
 To run the project
     mvn clean install
-    mvn exec:java -Dexec.args="arg[0], arg[1], arg[2]" 
+    mvn exec:java -Dexec.args="arg[0] arg[1] arg[2]" 
     args[0]: the simulation date (ISO date format: YYYY-MM-DD)
     args[1]: the spead factor
     args[2]: the number of threads
